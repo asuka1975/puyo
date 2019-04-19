@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include<curses.h>
 #include"Field.hpp"
 #include"FieldControl.hpp"
@@ -118,7 +119,7 @@ void Display(FieldControl& field) {
 	}
 
 	char msg[256];
-	sprintf_s(msg, "Field: %d x %d, Puyo number: %03d", field.GetLine(), field.GetColumn(), count);
+	sprintf(msg, "Field: %d x %d, Puyo number: %03d", field.GetLine(), field.GetColumn(), count);
 	mvaddstr(2, COLS - 35, msg);
 
 	refresh();

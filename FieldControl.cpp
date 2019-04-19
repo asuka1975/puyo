@@ -26,13 +26,13 @@ bool FieldControl::LandingPuyo() {
 					landed = false;
 					continue;
 				}
-				else {
+				else if (GetValue(y, x).handling) {
 					puyodata puyo = GetValue(y, x);
 					puyo.handling = false;
 					SetValue(y, x, puyo);
 					puyodata right = GetValue(y, x + 1);
 					right.handling = false;
-					SetValue(y, x, puyo);
+					SetValue(y, x + 1, right);
 					puyodata left = GetValue(y, x - 1);
 					left.handling = false;
 					SetValue(y, x - 1, left);
