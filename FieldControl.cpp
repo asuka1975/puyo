@@ -17,17 +17,31 @@ void FieldControl::GeneratePuyo() {
 }
 
 bool FieldControl::LandingPuyo() {
-	bool landed = false;
+	bool landed = true;
 
-	for (int y = 0; y < GetLine(); y++)
-	{
-		for (int x = 0; x < GetColumn(); x++)
-		{
-			if (GetValue(y, x).color != NONE && y == GetLine() - 1)
-			{
-				landed = true;
-
-				SetValue(y, x, puyodata());
+	for (int y = 0; y < GetLine(); y++) {
+		for (int x = 0; x < GetColumn(); x++) {
+			if (GetValue(y, x).color != NONE && y < GetLine() - 1) {
+				if (GetValue(y + 1, x).color == NONE) {
+					landed = false;
+					continue;
+				}
+				else {
+					puyodata puyo = GetValue(y, x);
+					puyo.handling = false;
+					SetValue(y, x, puyo);
+					puyodata right = GetValue(y, x + 1);
+					right.handling = false;
+					SetValue(y, x, puyo);
+					puyodata left = GetValue(y, x - 1);
+					left.handling = false;
+					SetValue(y, x - 1, left);
+				}
+			}
+			else {
+				puyodata puyo = GetValue(y, x);
+				puyo.handling = false;
+				SetValue(y, x, puyo);
 			}
 		}
 	}
@@ -40,29 +54,26 @@ void FieldControl::MoveLeft() {
 
 	for (int i = 0; i < GetLine()*GetColumn(); i++) puyo_temp[i] = puyodata();
 
-	for (int y = 0; y < GetLine(); y++)
-	{
-		for (int x = 0; x < GetColumn(); x++)
-		{
+	for (int y = 0; y < GetLine(); y++) {
+		for (int x = 0; x < GetColumn(); x++) {
 			if (GetValue(y, x).color == NONE) continue;
+			if (0 < x && GetValue(y, x - 1).color == NONE) {
+				if (!GetValue(y, x).handling) {
+					puyo_temp[y * GetColumn() + x] = GetValue(y, x);
+					continue;
+				}
+				puyo_temp[y * GetColumn() + (x - 1)] = GetValue(y, x);
 
-			if (0 < x && GetValue(y, x - 1).color == NONE)
-			{
-				puyo_temp[y*GetColumn() + (x - 1)] = GetValue(y, x);
-				
 				SetValue(y, x, puyodata());
 			}
-			else
-			{
+			else {
 				puyo_temp[y*GetColumn() + x] = GetValue(y, x);
 			}
 		}
 	}
 
-	for (int y = 0; y < GetLine(); y++)
-	{
-		for (int x = 0; x < GetColumn(); x++)
-		{
+	for (int y = 0; y < GetLine(); y++) {
+		for (int x = 0; x < GetColumn(); x++) {
 			SetValue(y, x, puyo_temp[y * GetColumn() + x]);
 		}
 	}
@@ -75,29 +86,26 @@ void FieldControl::MoveRight() {
 
 	for (int i = 0; i < GetLine() * GetColumn(); i++) puyo_temp[i] = puyodata();
 
-	for (int y = 0; y < GetLine(); y++)
-	{
-		for (int x = GetColumn() - 1; x >= 0; x--)
-		{
+	for (int y = 0; y < GetLine(); y++) {
+		for (int x = GetColumn() - 1; x >= 0; x--) {
 			if (GetValue(y, x).color == NONE) continue;
-
-			if (x < GetColumn() - 1 && GetValue(y, x + 1).color == NONE)
-			{
+			if (x < GetColumn() - 1 && GetValue(y, x + 1).color == NONE) {
+				if (!GetValue(y, x).handling) {
+					puyo_temp[y * GetColumn() + x] = GetValue(y, x);
+					continue;
+				}
 				puyo_temp[y * GetColumn() + (x + 1)] = GetValue(y, x);
 
 				SetValue(y, x, puyodata());
 			}
-			else
-			{
+			else {
 				puyo_temp[y * GetColumn() + x] = GetValue(y, x);
 			}
 		}
 	}
 
-	for (int y = 0; y <GetLine(); y++)
-	{
-		for (int x = 0; x < GetColumn(); x++)
-		{
+	for (int y = 0; y <GetLine(); y++) {
+		for (int x = 0; x < GetColumn(); x++) {
 			SetValue(y, x, puyo_temp[y * GetColumn() + x]);
 		}
 	}
@@ -110,29 +118,22 @@ void FieldControl::MoveDown() {
 
 	for (int i = 0; i < GetLine() * GetColumn(); i++) puyo_temp[i] = puyodata();
 
-	for (int y = GetLine() - 1; y >= 0; y--)
-	{
-		for (int x = 0; x < GetColumn(); x++)
-		{
+	for (int y = GetLine() - 1; y >= 0; y--) {
+		for (int x = 0; x < GetColumn(); x++) {
 			if (GetValue(y, x).color == NONE) continue;
-
-			if (y < GetLine() - 1 && GetValue(y + 1, x).color == NONE)
-			{
+			if (y < GetLine() - 1 && GetValue(y + 1, x).color == NONE) {
 				puyo_temp[(y + 1) * GetColumn() + x] = GetValue(y, x);
 
 				SetValue(y, x, puyodata());
 			}
-			else
-			{
+			else {
 				puyo_temp[y * GetColumn() + x] = GetValue(y, x);
 			}
 		}
 	}
 
-	for (int y = 0; y < GetLine(); y++)
-	{
-		for (int x = 0; x < GetColumn(); x++)
-		{
+	for (int y = 0; y < GetLine(); y++) {
+		for (int x = 0; x < GetColumn(); x++) {
 			SetValue(y, x, puyo_temp[y * GetColumn() + x]);
 		}
 	}
