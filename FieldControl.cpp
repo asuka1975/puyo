@@ -1,3 +1,4 @@
+#include<stdio.h>
 #include<cstdlib>
 #include<ctime>
 #include"Field.hpp"
@@ -139,4 +140,45 @@ void FieldControl::MoveDown() {
 	}
 
 	delete[] puyo_temp;
+}
+
+void FieldControl::VanishPuyo() {
+	for (int y = 0; y < GetLine(); y++) {
+		for (int x = 0; x < GetColumn(); x++) {
+			VanishPuyo(y, x);
+		}
+	}
+}
+
+void FieldControl::VanishPuyo(unsigned int y, unsigned int x) {
+	if (GetValue(y, x).color == NONE) return;
+
+	bool* check_field = new bool[GetColumn() * GetLine()];
+	for (int i = 0; i < GetColumn() * GetLine(); i++) check_field[i] = false;
+	if (VanishPuyo_r(y, x, check_field) >= 4) {
+		for (int y = 0; y < GetLine(); y++) {
+			for (int x = 0; x < GetColumn(); x++) {
+				SetValue(y, x, check_field[y * GetColumn() + x] ? puyodata() : GetValue(y, x));
+			}
+		}
+	}
+	delete[] check_field;
+}
+
+int FieldControl::VanishPuyo_r(unsigned int y, unsigned int x, bool* check_field) {
+	int vanish_num = 1;
+	check_field[y * GetColumn() + x] = true;
+	if (x > 0) {
+		vanish_num += !check_field[y * GetColumn() + (x - 1)] && (GetValue(y, x).color == GetValue(y, x - 1).color) ? VanishPuyo_r(y, x - 1, check_field) : 0;
+	}
+	if (x < GetColumn() - 1) {
+		vanish_num += !check_field[y * GetColumn() + (x + 1)] && (GetValue(y, x).color == GetValue(y, x + 1).color) ? VanishPuyo_r(y, x + 1, check_field) : 0;
+	}
+	if (y > 0) {
+		vanish_num += !check_field[(y - 1) * GetColumn() + x] && (GetValue(y, x).color == GetValue(y - 1, x).color) ? VanishPuyo_r(y - 1, x, check_field) : 0;
+	}
+	if(y < GetLine() - 1){
+		vanish_num += !check_field[(y + 1) * GetColumn() + x] && (GetValue(y, x).color == GetValue(y + 1, x).color) ? VanishPuyo_r(y + 1, x, check_field) : 0;
+	}
+	return vanish_num;
 }

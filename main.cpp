@@ -65,7 +65,9 @@ int main(int argc, char* argv[]) {
 			field.MoveDown();
 
 			if (field.LandingPuyo()) {
-				field.GeneratePuyo();
+				Display(field);
+				field.VanishPuyo();
+				if (field.LandingPuyo()) field.GeneratePuyo();
 			}
 		}
 		delay++;
