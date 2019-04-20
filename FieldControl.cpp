@@ -166,19 +166,19 @@ void FieldControl::VanishPuyo(unsigned int y, unsigned int x) {
 	delete[] check_field;
 }
 
-void FieldControl::RotatePuyo() {
+void FieldControl::RotatePuyo(int rot_dire) {
 	for (int y = puyorotate == 3 ? GetLine() - 1 : 0; puyorotate == 3 ? y >= 0 : y < GetLine(); puyorotate == 3 ? y-- : y++) {
 		for (int x = puyorotate == 2 ? GetColumn() - 1 : 0; puyorotate == 2 ? x >= 0 : x < GetColumn(); puyorotate == 2 ? x-- : x++) {
 			if (GetValue(y, x).handling) {
 				int old_x = x + ((puyorotate & 0b10) ? -1 : 1) * !(puyorotate & 0b01);
 				int old_y = y + ((puyorotate & 0b10) ? -1 : 1) * (puyorotate & 0b01);
-				int new_x = x + (((puyorotate + 1) & 0b10) ? -1 : 1) * !((puyorotate + 1) & 0b01);
-				int new_y = y + (((puyorotate + 1) & 0b10) ? -1 : 1) * ((puyorotate + 1) & 0b01);
+				int new_x = x + (((puyorotate + rot_dire) & 0b10) ? -1 : 1) * !((puyorotate + rot_dire) & 0b01);
+				int new_y = y + (((puyorotate + rot_dire) & 0b10) ? -1 : 1) * ((puyorotate + rot_dire) & 0b01);
 				if ((0 <= new_x && new_x < GetColumn()) && (0 <= new_y && new_y < GetLine()) && GetValue(new_y, new_x).color == NONE) {
 					puyodata puyo = GetValue(old_y, old_x);
 					SetValue(old_y, old_x, puyodata());
 					SetValue(new_y, new_x, puyo);
-					puyorotate = (puyorotate + 1) % 4;
+					puyorotate = (puyorotate + rot_dire) % 4 < 0 ? (puyorotate + rot_dire) % 4 + 4 : (puyorotate + rot_dire) % 4;
 				}
 
 				goto ROTATE_END;
