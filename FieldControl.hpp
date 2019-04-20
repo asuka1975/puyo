@@ -11,7 +11,9 @@ public:
 	void MoveDown();
 	void VanishPuyo();
 	void VanishPuyo(unsigned int y, unsigned int x);
+	void RotatePuyo();
 private:
+	int puyorotate;
 	int VanishPuyo_r(unsigned int y, unsigned int x, bool* check_field);
 };
 

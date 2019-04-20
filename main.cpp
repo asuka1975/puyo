@@ -55,6 +55,7 @@ int main(int argc, char* argv[]) {
 			field.MoveRight();
 			break;
 		case 'z':
+			field.RotatePuyo();
 			break;
 		default:
 			break;

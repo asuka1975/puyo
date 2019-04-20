@@ -5,10 +5,11 @@
 #include"FieldControl.hpp"
 
 FieldControl::FieldControl() : Field() {
-
+	puyorotate = 0;
 }
 
 void FieldControl::GeneratePuyo() {
+	puyorotate = 0;
 	srand(static_cast<unsigned>(time(NULL)));
 	puyodata newpuyo1(static_cast<puyocolor>(rand() % 4 + 1));
 	puyodata newpuyo2(static_cast<puyocolor>(rand() % 4 + 1));
@@ -20,23 +21,23 @@ void FieldControl::GeneratePuyo() {
 bool FieldControl::LandingPuyo() {
 	bool landed = true;
 
-	for (int y = 0; y < GetLine(); y++) {
+	for (int y = GetLine() - 1; y >= 0; y--) {
 		for (int x = 0; x < GetColumn(); x++) {
 			if (GetValue(y, x).color != NONE && y < GetLine() - 1) {
 				if (GetValue(y + 1, x).color == NONE) {
 					landed = false;
 					continue;
 				}
-				else if (GetValue(y, x).handling) {
+				else if (GetValue(y, x).handling && !GetValue(y + 1, x).handling) {
 					puyodata puyo = GetValue(y, x);
 					puyo.handling = false;
 					SetValue(y, x, puyo);
-					puyodata right = GetValue(y, x + 1);
+					puyodata right = GetValue(y + puyorotate % 2, x + !(puyorotate % 2));
 					right.handling = false;
-					SetValue(y, x + 1, right);
-					puyodata left = GetValue(y, x - 1);
+					SetValue(y + puyorotate % 2, x + !(puyorotate % 2), right);
+					puyodata left = GetValue(y - puyorotate % 2, x - !(puyorotate % 2));
 					left.handling = false;
-					SetValue(y, x - 1, left);
+					SetValue(y - puyorotate % 2, x - !(puyorotate % 2), left);
 				}
 			}
 			else {
@@ -163,6 +164,28 @@ void FieldControl::VanishPuyo(unsigned int y, unsigned int x) {
 		}
 	}
 	delete[] check_field;
+}
+
+void FieldControl::RotatePuyo() {
+	for (int y = puyorotate == 3 ? GetLine() - 1 : 0; puyorotate == 3 ? y >= 0 : y < GetLine(); puyorotate == 3 ? y-- : y++) {
+		for (int x = puyorotate == 2 ? GetColumn() - 1 : 0; puyorotate == 2 ? x >= 0 : x < GetColumn(); puyorotate == 2 ? x-- : x++) {
+			if (GetValue(y, x).handling) {
+				int old_x = x + ((puyorotate & 0b10) ? -1 : 1) * !(puyorotate & 0b01);
+				int old_y = y + ((puyorotate & 0b10) ? -1 : 1) * (puyorotate & 0b01);
+				int new_x = x + (((puyorotate + 1) & 0b10) ? -1 : 1) * !((puyorotate + 1) & 0b01);
+				int new_y = y + (((puyorotate + 1) & 0b10) ? -1 : 1) * ((puyorotate + 1) & 0b01);
+				if ((0 <= new_x && new_x < GetColumn()) && (0 <= new_y && new_y < GetLine()) && GetValue(new_y, new_x).color == NONE) {
+					puyodata puyo = GetValue(old_y, old_x);
+					SetValue(old_y, old_x, puyodata());
+					SetValue(new_y, new_x, puyo);
+					puyorotate = (puyorotate + 1) % 4;
+				}
+
+				goto ROTATE_END;
+			}
+		}
+	}
+ROTATE_END:;
 }
 
 int FieldControl::VanishPuyo_r(unsigned int y, unsigned int x, bool* check_field) {
