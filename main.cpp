@@ -68,7 +68,6 @@ int main(int argc, char* argv[]) {
 			field.MoveDown();
 
 			if (field.LandingPuyo()) {
-				Display(field);
 				field.VanishPuyo();
 				if (field.LandingPuyo()) field.GeneratePuyo();
 			}
@@ -126,6 +125,9 @@ void Display(FieldControl& field) {
 	char msg[256];
 	sprintf(msg, "Field: %d x %d, Puyo number: %03d", field.GetLine(), field.GetColumn(), count);
 	mvaddstr(2, COLS - 35, msg);
+
+	sprintf(msg, "Score: %6d", field.GetScore());
+	mvaddstr(5, COLS - 35, msg);
 
 	refresh();
 }

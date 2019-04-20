@@ -4,12 +4,22 @@
 #include"Field.hpp"
 #include"FieldControl.hpp"
 
+static int chain_table[19] = { 0, 8, 16, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512 };
+static int color_table[4] = { 0, 3, 6, 12 };
+
 FieldControl::FieldControl() : Field() {
 	puyorotate = 0;
+	score = 0;
+	chain = 0;
+	color_num = 0;
+	vanish_num = 0;
 }
 
 void FieldControl::GeneratePuyo() {
 	puyorotate = 0;
+	chain = 0;
+	color_num = 0;
+	vanish_num = 0;
 	srand(static_cast<unsigned>(time(NULL)));
 	puyodata newpuyo1(static_cast<puyocolor>(rand() % 4 + 1));
 	puyodata newpuyo2(static_cast<puyocolor>(rand() % 4 + 1));
@@ -144,10 +154,17 @@ void FieldControl::MoveDown() {
 }
 
 void FieldControl::VanishPuyo() {
+	color_num = 0;
 	for (int y = 0; y < GetLine(); y++) {
 		for (int x = 0; x < GetColumn(); x++) {
 			VanishPuyo(y, x);
 		}
+	}
+	if (color_num) {
+		chain++;
+		int _score = vanish_num * (chain_table[chain - 1 > 18 ? 18 : chain - 1] + color_table[color_num - 1 > 3 ? 3 : color_num - 1]);
+		_score = _score == 0 ? vanish_num : _score;
+		score += _score;
 	}
 }
 
@@ -162,6 +179,8 @@ void FieldControl::VanishPuyo(unsigned int y, unsigned int x) {
 				SetValue(y, x, check_field[y * GetColumn() + x] ? puyodata() : GetValue(y, x));
 			}
 		}
+		color_num++;
+		vanish_num++;
 	}
 	delete[] check_field;
 }
@@ -186,6 +205,10 @@ void FieldControl::RotatePuyo(int rot_dire) {
 		}
 	}
 ROTATE_END:;
+}
+
+int FieldControl::GetScore() {
+	return score;
 }
 
 int FieldControl::VanishPuyo_r(unsigned int y, unsigned int x, bool* check_field) {
