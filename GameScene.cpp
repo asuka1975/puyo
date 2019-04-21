@@ -1,10 +1,10 @@
 #define _CRT_SECURE_NO_WARNINGS
+#include<cstdlib>
 #include<curses.h>
 #include"Field.hpp"
 #include"FieldControl.hpp"
 #include"BaseScene.h"
-#include"TitleScene.h"
-#include"GameManager.h"
+#include "GameScene.h"
 
 #ifdef __WINDOWS
 #define _WAITINGCOUNT 3000;
@@ -12,88 +12,76 @@
 #define _WAITINGCOUNT 20000
 #endif
 
-#define DEBUG
+GameScene::GameScene() : field()
+{
+	delay = 0;
+	waitCount = _WAITINGCOUNT;
 
-void Display(FieldControl& field);
-
-int main(int argc, char* argv[]) {
-#ifndef DEBUG
-	FieldControl field;
-#endif
-
-	initscr();
-	start_color();
-
-	noecho();
-	cbreak();
-
-	curs_set(0);
-	keypad(stdscr, TRUE);
-
-	timeout(0);
-#ifndef DEBUG
 	init_pair(1, COLOR_RED, COLOR_WHITE);
 	init_pair(2, COLOR_BLUE, COLOR_WHITE);
 	init_pair(3, COLOR_GREEN, COLOR_WHITE);
 	init_pair(4, COLOR_YELLOW, COLOR_WHITE);
 	init_pair(5, COLOR_BLACK, COLOR_WHITE);
 
-
-	field.ChangeSize(LINES / 2, COLS / 2);	
+	field.ChangeSize(LINES / 2, COLS / 2);
 	field.GeneratePuyo();
 
-	int delay = 0;
-	int waitCount = _WAITINGCOUNT;
-
-	int puyostate = 0;
-#endif
-#ifdef DEBUG
-	GameManager manager;
-	manager.Run();
-#else
-	while (1) {
-		int ch;
-		ch = getch();
-
-		if (ch == 'Q') break;
-
-		switch (ch) {
-		case KEY_LEFT:
-			field.MoveLeft();
-			break;
-		case KEY_RIGHT:
-			field.MoveRight();
-			break;
-		case 'z':
-			field.RotatePuyo(RIGHT_ROTATE);
-			break;
-		case 'x':
-			field.RotatePuyo(LEFT_ROTATE);
-		default:
-			break;
+	for (int y = 0; y < LINES; y++) {
+		for (int x = 0; x < COLS; x++) {
+			attrset(COLOR_PAIR(0));
+			mvaddch(y, x, ' ');
 		}
-
-
-		if (delay%waitCount == 0) {
-			field.MoveDown();
-
-			if (field.LandingPuyo()) {
-				field.VanishPuyo();
-				if (field.LandingPuyo()) field.GeneratePuyo();
-			}
-		}
-		delay++;
-
-		
-		Display(field);
 	}
-#endif
-	endwin();
-
-	return 0;
 }
 
-void Display(FieldControl& field) {
+
+GameScene::~GameScene()
+{
+	
+}
+
+
+int GameScene::Update() {
+	int ch;
+	ch = getch();
+
+	if (ch == 'Q') exit(0);
+
+	switch (ch) {
+	case KEY_LEFT:
+		field.MoveLeft();
+		break;
+	case KEY_RIGHT:
+		field.MoveRight();
+		break;
+	case 'z':
+		field.RotatePuyo(RIGHT_ROTATE);
+		break;
+	case 'x':
+		field.RotatePuyo(LEFT_ROTATE);
+	default:
+		break;
+	}
+
+
+	if (delay%waitCount == 0) {
+		field.MoveDown();
+
+		if (field.LandingPuyo()) {
+			field.VanishPuyo();
+			if (field.LandingPuyo()) field.GeneratePuyo();
+		}
+	}
+	delay++;
+
+
+	Display();
+
+	return 1;
+}
+
+void GameScene::Display()
+{
 	for (int y = 0; y < field.GetLine(); y++) {
 		for (int x = 0; x < field.GetColumn(); x++) {
 			switch (field.GetValue(y, x).color) {
@@ -120,7 +108,7 @@ void Display(FieldControl& field) {
 			default:
 				mvaddch(y, x, '?');
 				break;
-			} 
+			}
 		}
 	}
 
