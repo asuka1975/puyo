@@ -3,24 +3,17 @@
 
 enum puyocolor{ NONE, RED, BLUE, GREEN, YELLOW };
 
-struct puyodata {
-	puyocolor color;
-	bool handling;
-	puyodata();
-	puyodata(puyocolor color);
-};
-
-class Field {
+class FieldArray {
 public:
-	Field();
-	~Field();
+	FieldArray();
+	~FieldArray();
 	void ChangeSize(unsigned int line, unsigned int column);
 	unsigned int GetLine();
 	unsigned int GetColumn();
-	puyodata GetValue(unsigned int y, unsigned int x);
-	void SetValue(unsigned int y, unsigned int x, puyodata value);
+	puyocolor GetValue(unsigned int y, unsigned int x);
+	void SetValue(unsigned int y, unsigned int x, puyocolor value);
 private:
-	puyodata * data;
+	puyocolor * data;
 	unsigned int data_line;
 	unsigned int data_column;
 	void Release();

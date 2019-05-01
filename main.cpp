@@ -1,6 +1,6 @@
 #include<curses.h>
-#include"Field.h"
-#include"FieldControl.h"
+#include"Field.hpp"
+#include"FieldControl.hpp"
 
 #ifdef __WINDOWS
 #define _WAITINGCOUNT 3000;
@@ -8,10 +8,11 @@
 #define _WAITINGCOUNT 20000
 #endif
 
-void Display(FieldControl& field);
+void Display(FieldArray& field);
 
 int main(int argc, char* argv[]) {
-	FieldControl field;
+	FieldArray field;
+	FieldControl controller;
 
 	initscr();
 	start_color();
@@ -32,7 +33,7 @@ int main(int argc, char* argv[]) {
 
 
 	field.ChangeSize(LINES / 2, COLS / 2);	
-	field.GeneratePuyo();
+	controller.GeneratePuyo(field);
 
 	int delay = 0;
 	int waitCount = _WAITINGCOUNT;
@@ -53,10 +54,10 @@ int main(int argc, char* argv[]) {
 		switch (ch)
 		{
 		case KEY_LEFT:
-			field.MoveLeft();
+			controller.MoveLeft(field);
 			break;
 		case KEY_RIGHT:
-			field.MoveRight();
+			controller.MoveRight(field);
 			break;
 		case 'z':
 			break;
@@ -66,11 +67,11 @@ int main(int argc, char* argv[]) {
 
 
 		if (delay%waitCount == 0) {
-			field.MoveDown();
+			controller.MoveDown(field);
 
-			if (field.LandingPuyo())
+			if (controller.LandingPuyo(field))
 			{
-				field.GeneratePuyo();
+				controller.GeneratePuyo(field);
 			}
 		}
 		delay++;
@@ -84,12 +85,12 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 
-void Display(FieldControl& field) {
+void Display(FieldArray& field) {
 	for (int y = 0; y < field.GetLine(); y++)
 	{
 		for (int x = 0; x < field.GetColumn(); x++)
 		{
-			switch (field.GetValue(y, x).color)
+			switch (field.GetValue(y, x))
 			{
 			case NONE:
 				attrset(COLOR_PAIR(5));
@@ -125,7 +126,7 @@ void Display(FieldControl& field) {
 	{
 		for (int x = 0; x < field.GetColumn(); x++)
 		{
-			if (field.GetValue(y, x).color != NONE)
+			if (field.GetValue(y, x) != NONE)
 			{
 				count++;
 			}

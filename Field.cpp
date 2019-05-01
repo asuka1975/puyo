@@ -1,57 +1,47 @@
-#include"Field.h"
+#include"Field.hpp"
 
 #define NULL 0
 
-puyodata::puyodata() {
-	color = NONE;
-	handling = false;
-}
-
-puyodata::puyodata(puyocolor color) {
-	this->color = color;
-	handling = true;
-}
-
-Field::Field() {
+FieldArray::FieldArray() {
 	data = NULL;
 	data_line = 0;
 	data_column = 0;
 }
 
-Field::~Field() {
+FieldArray::~FieldArray() {
 	delete[] data;
 }
 
-void Field::ChangeSize(unsigned int line, unsigned int column) {
+void FieldArray::ChangeSize(unsigned int line, unsigned int column) {
 	Release();
 
-	data = new puyodata[line * column];
+	data = new puyocolor[line * column];
 	data_line = line;
 	data_column = column;
-	for (int i = 0; i < line * column; i++) data[i] = puyodata();
+	for (int i = 0; i < line * column; i++) data[i] = NONE;
 }
 
-unsigned int Field::GetLine() {
+unsigned int FieldArray::GetLine() {
 	return data_line;
 }
 
-unsigned int Field::GetColumn() {
+unsigned int FieldArray::GetColumn() {
 	return data_column;
 }
 
-puyodata Field::GetValue(unsigned int y, unsigned int x) {
+puyocolor FieldArray::GetValue(unsigned int y, unsigned int x) {
 	if (y >= GetLine() || x >= GetColumn()) return NONE;
 
 	return data[y * GetColumn() + x];
 }
 
-void Field::SetValue(unsigned int y, unsigned int x, puyodata value) {
+void FieldArray::SetValue(unsigned int y, unsigned int x, puyocolor value) {
 	if (y >= GetLine() || x >= GetColumn()) return;
 
 	data[y * GetColumn() + x] = value;
 }
 
-void Field::Release() {
+void FieldArray::Release() {
 	if (!data) return;
 
 	delete[] data;
