@@ -1,13 +1,23 @@
 #ifndef _FIELDCONTROL_HPP
 #define _FIELDCONTROL_HPP
 
-class FieldControl {
+#include "PuyoArrayStack.hpp"
+#include "PuyoArrayActive.hpp"
+
+class PuyoControl {
 public:
-	void GeneratePuyo(FieldArray& field);
-	bool LandingPuyo(FieldArray& field);
-	void MoveLeft(FieldArray& field);
-	void MoveRight(FieldArray& field);
-	void MoveDown(FieldArray& field);
+	PuyoControl(unsigned int line, unsigned int column);
+	void GeneratePuyo(PuyoArrayActive& field);
+	bool LandingPuyo(PuyoArrayActive& field);
+	void MoveLeft(PuyoArrayActive& field);
+	void MoveRight(PuyoArrayActive& field);
+	void MoveDown(PuyoArrayActive& field);
+	puyocolor GetStack(unsigned int y, unsigned int x);
+private:
+	PuyoArrayStack stackArray;
+	void StackingActivePuyo(PuyoArrayActive& field);
+	void StackUpdate();
+	bool StackLanded();
 };
 
 #endif

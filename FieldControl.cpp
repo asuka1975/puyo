@@ -3,36 +3,43 @@
 #include"Field.hpp"
 #include"FieldControl.hpp"
 
-void FieldControl::GeneratePuyo(FieldArray& field) {
+PuyoControl::PuyoControl(unsigned int line, unsigned int column)
+{
+	stackArray.ChangeSize(line, column);
+}
+
+void PuyoControl::GeneratePuyo(PuyoArrayActive& field) {
 	srand(static_cast<unsigned>(time(NULL)));
 
 	field.SetValue(0, 5, static_cast<puyocolor>(rand() % 4 + 1));
 	field.SetValue(0, 6, static_cast<puyocolor>(rand() % 4 + 1));
 }
 
-bool FieldControl::LandingPuyo(FieldArray& field) {
-	bool landed = false;
+bool PuyoControl::LandingPuyo(PuyoArrayActive& field) {
+	bool landed = true;
 
 	for (int y = 0; y < field.GetLine(); y++)
 	{
 		for (int x = 0; x < field.GetColumn(); x++)
 		{
-			if (field.GetValue(y, x) != NONE && y == field.GetLine() - 1)
-			{
-				landed = true;
-
-				field.SetValue(y, x, NONE);
+			if (field.GetValue(y, x) != NONE) {
+				if (y == field.GetLine() - 1 || stackArray.GetValue(y + 1, x) != NONE) {
+					StackingActivePuyo(field);
+					landed = true;
+				}
+				else landed = false;
 			}
 		}
+	}
+	if (landed && !StackLanded()) {
+		StackUpdate();
+		landed = false;
 	}
 
 	return landed;
 }
 
-void FieldControl::MoveLeft(FieldArray& field) {
-	puyocolor *puyo_temp = new puyocolor[field.GetLine() * field.GetColumn()];
-
-	for (int i = 0; i < field.GetLine() * field.GetColumn(); i++) puyo_temp[i] = puyocolor();
+void PuyoControl::MoveLeft(PuyoArrayActive& field) {
 
 	for (int y = 0; y < field.GetLine(); y++)
 	{
@@ -40,70 +47,32 @@ void FieldControl::MoveLeft(FieldArray& field) {
 		{
 			if (field.GetValue(y, x) == NONE) continue;
 
-			if (0 < x && field.GetValue(y, x - 1) == NONE)
+			if (0 < x && stackArray.GetValue(y, x - 1) == NONE && field.GetValue(y, x - 1) == NONE)
 			{
-				puyo_temp[y * field.GetColumn() + (x - 1)] = field.GetValue(y, x);
-				
+				field.SetValue(y, x - 1, field.GetValue(y, x));
 				field.SetValue(y, x, NONE);
 			}
-			else
-			{
-				puyo_temp[y * field.GetColumn() + x] = field.GetValue(y, x);
-			}
 		}
 	}
-
-	for (int y = 0; y < field.GetLine(); y++)
-	{
-		for (int x = 0; x < field.GetColumn(); x++)
-		{
-			field.SetValue(y, x, puyo_temp[y * field.GetColumn() + x]);
-		}
-	}
-
-	delete[] puyo_temp;
 }
 
-void FieldControl::MoveRight(FieldArray& field) {
-	puyocolor *puyo_temp = new puyocolor[field.GetLine() * field.GetColumn()];
-
-	for (int i = 0; i < field.GetLine() * field.GetColumn(); i++) puyo_temp[i] = NONE;
-
+void PuyoControl::MoveRight(PuyoArrayActive& field) {
 	for (int y = 0; y < field.GetLine(); y++)
 	{
 		for (int x = field.GetColumn() - 1; x >= 0; x--)
 		{
 			if (field.GetValue(y, x) == NONE) continue;
 
-			if (x < field.GetColumn() - 1 && field.GetValue(y, x + 1) == NONE)
+			if (x < field.GetColumn() - 1 && stackArray.GetValue(y, x + 1) == NONE && field.GetValue(y, x + 1) == NONE)
 			{
-				puyo_temp[y * field.GetColumn() + (x + 1)] = field.GetValue(y, x);
-
+				field.SetValue(y, x + 1, field.GetValue(y, x));
 				field.SetValue(y, x, NONE);
 			}
-			else
-			{
-				puyo_temp[y * field.GetColumn() + x] = field.GetValue(y, x);
-			}
 		}
 	}
-
-	for (int y = 0; y < field.GetLine(); y++)
-	{
-		for (int x = 0; x < field.GetColumn(); x++)
-		{
-			field.SetValue(y, x, puyo_temp[y * field.GetColumn() + x]);
-		}
-	}
-
-	delete[] puyo_temp;
 }
 
-void FieldControl::MoveDown(FieldArray& field) {
-	puyocolor *puyo_temp = new puyocolor[field.GetLine() * field.GetColumn()];
-
-	for (int i = 0; i < field.GetLine() * field.GetColumn(); i++) puyo_temp[i] = NONE;
-
+void PuyoControl::MoveDown(PuyoArrayActive& field) {
 	for (int y = field.GetLine() - 1; y >= 0; y--)
 	{
 		for (int x = 0; x < field.GetColumn(); x++)
@@ -112,24 +81,49 @@ void FieldControl::MoveDown(FieldArray& field) {
 
 			if (y < field.GetLine() - 1 && field.GetValue(y + 1, x) == NONE)
 			{
-				puyo_temp[(y + 1) * field.GetColumn() + x] = field.GetValue(y, x);
-
+				field.SetValue(y + 1, x, field.GetValue(y, x));
 				field.SetValue(y, x, NONE);
 			}
-			else
-			{
-				puyo_temp[y * field.GetColumn() + x] = field.GetValue(y, x);
+		}
+	}
+}
+
+puyocolor PuyoControl::GetStack(unsigned int y, unsigned int x)
+{
+	return stackArray.GetValue(y, x);
+}
+
+void PuyoControl::StackingActivePuyo(PuyoArrayActive& field)
+{
+	for (int y = 0; y < field.GetLine(); y++) {
+		for (int x = 0; x < field.GetColumn(); x++) {
+			if (field.GetValue(y, x) != NONE) {
+				stackArray.SetValue(y, x, field.GetValue(y, x));
+				field.SetValue(y, x, NONE);
 			}
 		}
 	}
+}
 
-	for (int y = 0; y < field.GetLine(); y++)
-	{
-		for (int x = 0; x < field.GetColumn(); x++)
-		{
-			field.SetValue(y, x, puyo_temp[y * field.GetColumn() + x]);
+void PuyoControl::StackUpdate()
+{
+	for (int y = stackArray.GetLine() - 2; y >= 0; y--) {
+		for (int x = 0; x < stackArray.GetColumn(); x++) {
+			if (stackArray.GetValue(y, x) != NONE && stackArray.GetValue(y + 1, x) == NONE) {
+				stackArray.SetValue(y + 1, x, stackArray.GetValue(y, x));
+				stackArray.SetValue(y, x, NONE);
+			}
 		}
 	}
+}
 
-	delete[] puyo_temp;
+bool PuyoControl::StackLanded()
+{
+	for (int y = 0; y < stackArray.GetLine() - 1; y++) {
+		for (int x = 0; x < stackArray.GetColumn(); x++) {
+			if (stackArray.GetValue(y, x) != NONE && stackArray.GetValue(y + 1, x) == NONE) 
+				return false;
+		}
+	}
+	return true;
 }

@@ -3,17 +3,14 @@
 #include"FieldControl.hpp"
 
 #ifdef __WINDOWS
-#define _WAITINGCOUNT 3000;
+#define _WAITINGCOUNT 1500;
 #else
 #define _WAITINGCOUNT 20000
 #endif
 
-void Display(FieldArray& field);
+void Display(PuyoArrayActive& field, PuyoControl& controller);
 
 int main(int argc, char* argv[]) {
-	FieldArray field;
-	FieldControl controller;
-
 	initscr();
 	start_color();
 
@@ -32,7 +29,9 @@ int main(int argc, char* argv[]) {
 	init_pair(5, COLOR_BLACK, COLOR_WHITE);
 
 
-	field.ChangeSize(LINES / 2, COLS / 2);	
+	PuyoArrayActive field;
+	PuyoControl controller(LINES / 2, COLS / 2);
+	field.ChangeSize(LINES / 2, COLS / 2);
 	controller.GeneratePuyo(field);
 
 	int delay = 0;
@@ -66,7 +65,7 @@ int main(int argc, char* argv[]) {
 		}
 
 
-		if (delay%waitCount == 0) {
+		if (delay % waitCount == 0) {
 			controller.MoveDown(field);
 
 			if (controller.LandingPuyo(field))
@@ -77,7 +76,7 @@ int main(int argc, char* argv[]) {
 		delay++;
 
 		
-		Display(field);
+		Display(field, controller);
 	}
 
 	endwin();
@@ -85,12 +84,20 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 
-void Display(FieldArray& field) {
+void Display(PuyoArrayActive& field, PuyoControl& controller) {
+	int line = field.GetLine();
+	int column = field.GetColumn();
+
 	for (int y = 0; y < field.GetLine(); y++)
 	{
 		for (int x = 0; x < field.GetColumn(); x++)
 		{
-			switch (field.GetValue(y, x))
+			puyocolor value = controller.GetStack(y, x) != NONE ?
+				controller.GetStack(y, x) :
+				field.GetValue(y, x) != NONE ?
+				field.GetValue(y, x) :
+				NONE;
+			switch (value)
 			{
 			case NONE:
 				attrset(COLOR_PAIR(5));
@@ -116,7 +123,7 @@ void Display(FieldArray& field) {
 				mvaddch(y, x, '?');
 				break;
 			}
-
+			int num = 0;
 		}
 	}
 
@@ -126,7 +133,7 @@ void Display(FieldArray& field) {
 	{
 		for (int x = 0; x < field.GetColumn(); x++)
 		{
-			if (field.GetValue(y, x) != NONE)
+			if (controller.GetStack(y, x) != NONE)
 			{
 				count++;
 			}

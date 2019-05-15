@@ -3,10 +3,10 @@
 
 enum puyocolor{ NONE, RED, BLUE, GREEN, YELLOW };
 
-class FieldArray {
+class PuyoArray {
 public:
-	FieldArray();
-	~FieldArray();
+	PuyoArray();
+	~PuyoArray();
 	void ChangeSize(unsigned int line, unsigned int column);
 	unsigned int GetLine();
 	unsigned int GetColumn();
