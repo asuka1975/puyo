@@ -1,9 +1,10 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include<curses.h>
 #include"Field.hpp"
 #include"FieldControl.hpp"
 
 #ifdef __WINDOWS
-#define _WAITINGCOUNT 1500;
+#define _WAITINGCOUNT 500;
 #else
 #define _WAITINGCOUNT 20000
 #endif
@@ -66,12 +67,12 @@ int main(int argc, char* argv[]) {
 
 
 		if (delay % waitCount == 0) {
-			controller.MoveDown(field);
 
 			if (controller.LandingPuyo(field))
 			{
 				controller.GeneratePuyo(field);
 			}
+			controller.MoveDown(field);
 		}
 		delay++;
 
@@ -92,11 +93,8 @@ void Display(PuyoArrayActive& field, PuyoControl& controller) {
 	{
 		for (int x = 0; x < field.GetColumn(); x++)
 		{
-			puyocolor value = controller.GetStack(y, x) != NONE ?
-				controller.GetStack(y, x) :
-				field.GetValue(y, x) != NONE ?
-				field.GetValue(y, x) :
-				NONE;
+			puyocolor value = (puyocolor)(controller.GetStack(y, x) | field.GetValue(y, x));
+			value = (0x04 & value) ? (puyocolor)(value & (-value)) : value;
 			switch (value)
 			{
 			case NONE:
@@ -141,7 +139,7 @@ void Display(PuyoArrayActive& field, PuyoControl& controller) {
 	}
 
 	char msg[256];
-	sprintf_s(msg, "Field: %d x %d, Puyo number: %03d", field.GetLine(), field.GetColumn(), count);
+	sprintf(msg, "Field: %d x %d, Puyo number: %03d", field.GetLine(), field.GetColumn(), count);
 	mvaddstr(2, COLS - 35, msg);
 
 	refresh();
