@@ -93,6 +93,37 @@ puyocolor PuyoControl::GetStack(unsigned int y, unsigned int x)
 	return stackArray.GetValue(y, x);
 }
 
+int PuyoControl::VanishPuyo()
+{
+	int count = 0;
+	for (int y = 0; y < stackArray.GetLine(); y++) {
+		for (int x = 0; x < stackArray.GetColumn(); x++) {
+			if (GetStack(y, x) != NONE) count += VanishPuyo(y, x);
+		}
+	}
+	return count;
+}
+
+int PuyoControl::VanishPuyo(unsigned int y, unsigned int x)
+{
+	bool* check_field = new bool[stackArray.GetColumn() * stackArray.GetLine()];
+	for (int i = 0; i < stackArray.GetColumn() * stackArray.GetLine(); i++) check_field[i] = false;
+
+	CheckVanishingPuyo(check_field, y, x);
+
+	int count = 0;
+	for (int i = 0; i < stackArray.GetColumn() * stackArray.GetLine(); i++) if (check_field[i]) count++;
+	if (count < 4) return 0;
+
+	for (int y = 0; y < stackArray.GetLine(); y++) {
+		for (int x = 0; x < stackArray.GetColumn(); x++) {
+			if (check_field[y * stackArray.GetColumn() + x]) stackArray.SetValue(y, x, NONE);
+		}
+	}
+
+	return count;
+}
+
 void PuyoControl::StackingActivePuyo(PuyoArrayActive& field)
 {
 	for (int y = 0; y < field.GetLine(); y++) {
@@ -126,4 +157,14 @@ bool PuyoControl::StackLanded()
 		}
 	}
 	return true;
+}
+
+void PuyoControl::CheckVanishingPuyo(bool * check_field, unsigned int y, unsigned int x)
+{
+	puyocolor current_puyo = stackArray.GetValue(y, x);
+	check_field[y * stackArray.GetColumn() + x] = true;
+	if (stackArray.GetValue(y, x + 1) == current_puyo && !check_field[y * stackArray.GetColumn() + (x + 1)]) CheckVanishingPuyo(check_field, y, x + 1);
+	if (stackArray.GetValue(y, x - 1) == current_puyo && !check_field[y * stackArray.GetColumn() + (x - 1)]) CheckVanishingPuyo(check_field, y, x - 1);
+	if (stackArray.GetValue(y + 1, x) == current_puyo && !check_field[(y + 1) * stackArray.GetColumn() + x]) CheckVanishingPuyo(check_field, y + 1, x);
+	if (stackArray.GetValue(y - 1, x) == current_puyo && !check_field[(y - 1) * stackArray.GetColumn() + x]) CheckVanishingPuyo(check_field, y - 1, x);
 }

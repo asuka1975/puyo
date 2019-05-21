@@ -4,7 +4,7 @@
 #include"FieldControl.hpp"
 
 #ifdef __WINDOWS
-#define _WAITINGCOUNT 500;
+#define _WAITINGCOUNT 1000;
 #else
 #define _WAITINGCOUNT 20000
 #endif
@@ -67,12 +67,12 @@ int main(int argc, char* argv[]) {
 
 
 		if (delay % waitCount == 0) {
+			controller.MoveDown(field);
 
-			if (controller.LandingPuyo(field))
+			if (controller.LandingPuyo(field) && !controller.VanishPuyo())
 			{
 				controller.GeneratePuyo(field);
 			}
-			controller.MoveDown(field);
 		}
 		delay++;
 

@@ -13,11 +13,14 @@ public:
 	void MoveRight(PuyoArrayActive& field);
 	void MoveDown(PuyoArrayActive& field);
 	puyocolor GetStack(unsigned int y, unsigned int x);
+	int VanishPuyo();
+	int VanishPuyo(unsigned int y, unsigned int x);
 private:
 	PuyoArrayStack stackArray;
 	void StackingActivePuyo(PuyoArrayActive& field);
 	void StackUpdate();
 	bool StackLanded();
+	void CheckVanishingPuyo(bool* check_field, unsigned int y, unsigned int x);
 };
 
 #endif
