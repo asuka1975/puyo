@@ -60,7 +60,10 @@ int main(int argc, char* argv[]) {
 			controller.MoveRight(field);
 			break;
 		case 'z':
+			controller.Rotate(field, 1);
 			break;
+		case 'x':
+			controller.Rotate(field, -1);
 		default:
 			break;
 		}
@@ -140,6 +143,7 @@ void Display(PuyoArrayActive& field, PuyoControl& controller) {
 
 	char msg[256];
 	sprintf(msg, "Field: %d x %d, Puyo number: %03d", field.GetLine(), field.GetColumn(), count);
+	attrset(COLOR_PAIR(5));
 	mvaddstr(2, COLS - 35, msg);
 
 	refresh();

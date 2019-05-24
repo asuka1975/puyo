@@ -5,11 +5,12 @@
 
 PuyoControl::PuyoControl(unsigned int line, unsigned int column)
 {
+	srand(static_cast<unsigned>(time(NULL)));
 	stackArray.ChangeSize(line, column);
 }
 
 void PuyoControl::GeneratePuyo(PuyoArrayActive& field) {
-	srand(static_cast<unsigned>(time(NULL)));
+	field.ResetRotation();
 
 	field.SetValue(0, 5, static_cast<puyocolor>(rand() % 4 + 1));
 	field.SetValue(0, 6, static_cast<puyocolor>(rand() % 4 + 1));
@@ -122,6 +123,29 @@ int PuyoControl::VanishPuyo(unsigned int y, unsigned int x)
 	}
 
 	return count;
+}
+
+void PuyoControl::Rotate(PuyoArrayActive & field, int rot_dire)
+{
+	for (int is_rot3 = field.GetRotation() == 3, y = is_rot3 ? field.GetLine() - 1 : 0; is_rot3 ? y >= 0 : y < field.GetLine(); is_rot3 ? y-- : y++) {
+		for (int is_rot2 = field.GetRotation() == 2, x = is_rot2 ? field.GetColumn() - 1 : 0; is_rot2 ? x >= 0 : x < field.GetColumn(); is_rot2 ? x-- : x++) {
+			if (field.GetValue(y, x) != NONE) {
+				int old_x = x + ((field.GetRotation() & 0b10) ? -1 : 1) * !(field.GetRotation() & 0b01);
+				int old_y = y + ((field.GetRotation() & 0b10) ? -1 : 1) *  (field.GetRotation() & 0b01);
+				int new_x = x + (((field.GetRotation() + rot_dire) & 0b10) ? -1 : 1) * !((field.GetRotation() + rot_dire) & 0b01);
+				int new_y = y + (((field.GetRotation() + rot_dire) & 0b10) ? -1 : 1) *  ((field.GetRotation() + rot_dire) & 0b01);
+				if ((0 <= new_x && new_x < field.GetColumn()) && (0 <= new_y && new_y < field.GetLine()) && GetStack(new_y, new_x) == NONE) {
+					puyocolor puyo = field.GetValue(old_y, old_x);
+					field.SetValue(old_y, old_x, NONE);
+					field.SetValue(new_y, new_x, puyo);
+					field.RotatePuyo(rot_dire);
+
+					goto ROTATE_END;
+				}
+			}
+		}
+	}
+ROTATE_END:;
 }
 
 void PuyoControl::StackingActivePuyo(PuyoArrayActive& field)

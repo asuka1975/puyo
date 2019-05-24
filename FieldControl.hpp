@@ -15,6 +15,7 @@ public:
 	puyocolor GetStack(unsigned int y, unsigned int x);
 	int VanishPuyo();
 	int VanishPuyo(unsigned int y, unsigned int x);
+	void Rotate(PuyoArrayActive& puyoactive, int rot_dire);
 private:
 	PuyoArrayStack stackArray;
 	void StackingActivePuyo(PuyoArrayActive& field);
