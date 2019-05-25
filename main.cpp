@@ -23,10 +23,10 @@ int main(int argc, char* argv[]) {
 
 	timeout(0);
 
-	init_pair(1, COLOR_RED, COLOR_WHITE);
-	init_pair(2, COLOR_BLUE, COLOR_WHITE);
-	init_pair(3, COLOR_GREEN, COLOR_WHITE);
-	init_pair(4, COLOR_YELLOW, COLOR_WHITE);
+	init_pair(1, COLOR_RED, COLOR_RED);
+	init_pair(2, COLOR_BLUE, COLOR_BLUE);
+	init_pair(3, COLOR_GREEN, COLOR_GREEN);
+	init_pair(4, COLOR_YELLOW, COLOR_YELLOW);
 	init_pair(5, COLOR_BLACK, COLOR_WHITE);
 
 
@@ -106,19 +106,19 @@ void Display(PuyoArrayActive& field, PuyoControl& controller) {
 				break;
 			case RED:
 				attrset(COLOR_PAIR(1));
-				mvaddch(y, x, 'R');
+				mvaddch(y, x, ' ');
 				break;
 			case BLUE:
 				attrset(COLOR_PAIR(2));
-				mvaddch(y, x, 'B');
+				mvaddch(y, x, ' ');
 				break;
 			case GREEN:
 				attrset(COLOR_PAIR(3));
-				mvaddch(y, x, 'G');
+				mvaddch(y, x, ' ');
 				break;
 			case YELLOW:
 				attrset(COLOR_PAIR(4));
-				mvaddch(y, x, 'Y');
+				mvaddch(y, x, ' ');
 				break;
 			default:
 				mvaddch(y, x, '?');
