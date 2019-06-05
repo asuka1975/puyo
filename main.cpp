@@ -2,6 +2,7 @@
 #include<curses.h>
 #include"Field.hpp"
 #include"FieldControl.hpp"
+#include"PuyoGenerator.hpp"
 
 #ifdef __WINDOWS
 #define _WAITINGCOUNT 1000;
@@ -9,7 +10,11 @@
 #define _WAITINGCOUNT 20000
 #endif
 
+#define DEBUG
+
+
 void Display(PuyoArrayActive& field, PuyoControl& controller);
+void NextPuyoDisplay(PuyoArrayActive& field);
 
 int main(int argc, char* argv[]) {
 	initscr();
@@ -33,7 +38,10 @@ int main(int argc, char* argv[]) {
 	PuyoArrayActive field;
 	PuyoControl controller(LINES / 2, COLS / 2);
 	field.ChangeSize(LINES / 2, COLS / 2);
-	controller.GeneratePuyo(field);
+#ifdef DEBUG
+	controller.TestCaseStackField();
+#endif
+
 
 	int delay = 0;
 	int waitCount = _WAITINGCOUNT;
@@ -70,12 +78,12 @@ int main(int argc, char* argv[]) {
 
 
 		if (delay % waitCount == 0) {
-			controller.MoveDown(field);
 
 			if (controller.LandingPuyo(field) && !controller.VanishPuyo())
 			{
 				controller.GeneratePuyo(field);
 			}
+			controller.MoveDown(field);
 		}
 		delay++;
 
@@ -128,6 +136,7 @@ void Display(PuyoArrayActive& field, PuyoControl& controller) {
 		}
 	}
 
+	NextPuyoDisplay(field);
 
 	int count = 0;
 	for (int y = 0; y < field.GetLine(); y++)
@@ -147,4 +156,55 @@ void Display(PuyoArrayActive& field, PuyoControl& controller) {
 	mvaddstr(2, COLS - 35, msg);
 
 	refresh();
+}
+
+void NextPuyoDisplay(PuyoArrayActive& field)
+{
+	puyocolor next[4];
+
+	PuyoGenerator::GetNext(0, next[0], next[1]);
+	PuyoGenerator::GetNext(1, next[2], next[3]);
+
+	int xpos = field.GetColumn() + 1;
+	int ypos = 2;
+	int width = 3;
+	int height = 7;
+
+	for (int y = ypos; y < ypos + height; y++) {
+		for (int x = xpos; x < xpos + width; x++) {
+			attrset(COLOR_PAIR(5));
+			mvaddch(y, x, ' ');
+		}
+	}
+
+	for (int i = 0; i < 4; i++) {
+		int x = xpos + 1;
+		int y = ypos + 1 + i + i / 2;
+		switch (next[i])
+		{
+		case RED:
+			attrset(COLOR_PAIR(1));
+			mvaddch(y, x, ' ');
+			break;
+		case BLUE:
+			attrset(COLOR_PAIR(2));
+			mvaddch(y, x, ' ');
+			break;
+		case GREEN:
+			attrset(COLOR_PAIR(3));
+			mvaddch(y, x, ' ');
+			break;
+		case YELLOW:
+			attrset(COLOR_PAIR(4));
+			mvaddch(y, x, ' ');
+			break;
+		default:
+			mvaddch(y, x, '?');
+			break;
+		}
+		int num = 0;
+	}
+
+	attrset(COLOR_PAIR(0));
+	mvaddstr(ypos - 1, xpos, "next");
 }

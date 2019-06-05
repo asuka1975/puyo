@@ -2,18 +2,18 @@
 #include<ctime>
 #include"Field.hpp"
 #include"FieldControl.hpp"
+#include"PuyoGenerator.hpp"
 
 PuyoControl::PuyoControl(unsigned int line, unsigned int column)
 {
-	srand(static_cast<unsigned>(time(NULL)));
 	stackArray.ChangeSize(line, column);
 }
 
 void PuyoControl::GeneratePuyo(PuyoArrayActive& field) {
 	field.ResetRotation();
 
-	field.SetValue(0, 5, static_cast<puyocolor>(rand() % 4 + 1));
-	field.SetValue(0, 6, static_cast<puyocolor>(rand() % 4 + 1));
+	field.SetValue(0, 5, PuyoGenerator::Generate());
+	field.SetValue(0, 6, PuyoGenerator::Generate());
 }
 
 bool PuyoControl::LandingPuyo(PuyoArrayActive& field) {
@@ -50,6 +50,7 @@ void PuyoControl::MoveLeft(PuyoArrayActive& field) {
 
 			if (0 < x && stackArray.GetValue(y, x - 1) == NONE && field.GetValue(y, x - 1) == NONE)
 			{
+				if (field.GetValue(y + 1, x) != NONE && stackArray.GetValue(y + 1, x - 1) != NONE) break;
 				field.SetValue(y, x - 1, field.GetValue(y, x));
 				field.SetValue(y, x, NONE);
 			}
@@ -66,6 +67,7 @@ void PuyoControl::MoveRight(PuyoArrayActive& field) {
 
 			if (x < field.GetColumn() - 1 && stackArray.GetValue(y, x + 1) == NONE && field.GetValue(y, x + 1) == NONE)
 			{
+				if (field.GetValue(y + 1, x) != NONE && stackArray.GetValue(y + 1, x + 1) != NONE) break;
 				field.SetValue(y, x + 1, field.GetValue(y, x));
 				field.SetValue(y, x, NONE);
 			}
@@ -146,6 +148,17 @@ void PuyoControl::Rotate(PuyoArrayActive & field, int rot_dire)
 		}
 	}
 ROTATE_END:;
+}
+
+void PuyoControl::TestCaseStackField()
+{
+	stackArray.SetValue(stackArray.GetLine() / 2, stackArray.GetColumn() / 2, BLUE);
+	stackArray.SetValue(stackArray.GetLine() / 2 + 1, stackArray.GetColumn() / 2, BLUE);
+}
+
+void PuyoControl::TestGeneratePuyo()
+{
+
 }
 
 void PuyoControl::StackingActivePuyo(PuyoArrayActive& field)

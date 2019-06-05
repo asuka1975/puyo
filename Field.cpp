@@ -1,6 +1,8 @@
 #include"Field.hpp"
 
+#ifndef NULL
 #define NULL 0
+#endif
 
 PuyoArray::PuyoArray() {
 	data = NULL;
