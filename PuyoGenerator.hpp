@@ -12,6 +12,8 @@ public:
 	static puyocolor Generate();
 private:
 	~PuyoGenerator();
+	PuyoGenerator();
+	static void Dispose();
 	static puyocolor* next1;
 	static puyocolor* next2;
 };

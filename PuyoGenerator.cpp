@@ -12,11 +12,13 @@ public:
 };
 Initializer initializer;
 
-puyocolor* PuyoGenerator::next1;
-puyocolor* PuyoGenerator::next2;
+puyocolor* PuyoGenerator::next1 = NULL;
+puyocolor* PuyoGenerator::next2 = NULL;
 
 void PuyoGenerator::Initialize()
 {
+	Dispose();
+
 	srand(static_cast<unsigned>(time(NULL)));
 
 	next1 = new puyocolor[2];
@@ -53,6 +55,11 @@ puyocolor PuyoGenerator::Generate()
 }
 
 PuyoGenerator::~PuyoGenerator()
+{
+	Dispose();
+}
+
+void PuyoGenerator::Dispose()
 {
 	if (!next1) {
 		delete[] next1;

@@ -59,6 +59,8 @@ int main(int argc, char* argv[]) {
 			break;
 		}
 
+		if (waitCount == 10) waitCount = _WAITINGCOUNT;
+
 		switch (ch)
 		{
 		case KEY_LEFT:
@@ -66,6 +68,9 @@ int main(int argc, char* argv[]) {
 			break;
 		case KEY_RIGHT:
 			controller.MoveRight(field);
+			break;
+		case KEY_DOWN:
+			waitCount = 10;
 			break;
 		case 'z':
 			controller.Rotate(field, 1);
