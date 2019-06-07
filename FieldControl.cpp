@@ -6,6 +6,11 @@
 
 PuyoControl::PuyoControl(unsigned int line, unsigned int column)
 {
+	Initialize(line, column);
+}
+
+void PuyoControl::Initialize(unsigned int line, unsigned int column)
+{
 	stackArray.ChangeSize(line, column);
 }
 
@@ -150,15 +155,14 @@ void PuyoControl::Rotate(PuyoArrayActive & field, int rot_dire)
 ROTATE_END:;
 }
 
-void PuyoControl::TestCaseStackField()
+bool PuyoControl::IsGameOver(PuyoArrayActive & field)
 {
-	stackArray.SetValue(stackArray.GetLine() / 2, stackArray.GetColumn() / 2, BLUE);
-	stackArray.SetValue(stackArray.GetLine() / 2 + 1, stackArray.GetColumn() / 2, BLUE);
-}
-
-void PuyoControl::TestGeneratePuyo()
-{
-
+	for (int y = 0; y < field.GetLine(); y++) {
+		for (int x = 0; x < field.GetColumn(); x++) {
+			if (field.GetValue(y, x) != NONE && GetStack(y, x) != NONE) return true;
+		}
+	}
+	return false;
 }
 
 void PuyoControl::StackingActivePuyo(PuyoArrayActive& field)

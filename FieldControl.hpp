@@ -7,6 +7,7 @@
 class PuyoControl {
 public:
 	PuyoControl(unsigned int line, unsigned int column);
+	void Initialize(unsigned int line, unsigned int column);
 	void GeneratePuyo(PuyoArrayActive& field);
 	bool LandingPuyo(PuyoArrayActive& field);
 	void MoveLeft(PuyoArrayActive& field);
@@ -16,9 +17,7 @@ public:
 	int VanishPuyo();
 	int VanishPuyo(unsigned int y, unsigned int x);
 	void Rotate(PuyoArrayActive& puyoactive, int rot_dire);
-
-	void TestCaseStackField();
-	void TestGeneratePuyo();
+	bool IsGameOver(PuyoArrayActive& field);
 private:
 	PuyoArrayStack stackArray;
 	void StackingActivePuyo(PuyoArrayActive& field);
