@@ -1,5 +1,5 @@
 #define _CRT_SECURE_NO_WARNINGS
-#include<array>
+#include<vector>
 #include<algorithm>
 #include<curses.h>
 #include"Field.hpp"
@@ -19,11 +19,11 @@ void NextPuyoDisplay(PuyoArrayActive& field);
 void GameOverDisplay(PuyoArrayActive& field, PuyoControl& controller);
 void PutPuyoYX(unsigned int y, unsigned int x, puyocolor puyo);
 void RecordInit();
-void Record(int scre, std::array<int, 5>& record);
+void Record(int scre, std::vector<int>& record);
 
 static int score = 0;
 static double chain = 1.0;
-std::array<int, 5> records = { 0, 0, 0, 0, 0 };
+std::vector<int> records = { 0, 0, 0, 0, 0 };
 static void(*displayFunc)(PuyoArrayActive& field, PuyoControl& controller) = Display;
 
 int main(int argc, char* argv[]) {
@@ -229,7 +229,7 @@ void GameOverDisplay(PuyoArrayActive & field, PuyoControl & controller)
 	}
 
 	attrset(COLOR_PAIR(5));
-	std::array<int, 5>::iterator iter = std::find(records.begin(), records.end(), score);
+	std::vector<int>::iterator iter = std::find(records.begin(), records.end(), score);
 	if (iter == records.end()) {
 		char yourscore[256];
 		sprintf(yourscore, "*. %d\t*", score);
@@ -242,6 +242,8 @@ void GameOverDisplay(PuyoArrayActive & field, PuyoControl & controller)
 		sprintf(yourscore, "%d. %d\t*", idx + 1, score);
 		mvaddstr(y + 3 + idx, x - 2, yourscore);
 	}
+
+	mvaddstr(y + 11, x - 2, "click N-Key to new game.");
 	
 }
 
@@ -285,7 +287,7 @@ void RecordInit()
 	fclose(fp);
 }
 
-void Record(int scre, std::array<int, 5>& record)
+void Record(int scre, std::vector<int>& record)
 {
 	FILE* fp = fopen("record.txt", "r");
 	for (int i = 0; i < record.size(); i++) {
