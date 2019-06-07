@@ -23,7 +23,7 @@ void Record(int scre, std::vector<int>& record);
 
 static int score = 0;
 static double chain = 1.0;
-std::vector<int> records = { 0, 0, 0, 0, 0 };
+std::vector<int> records(5);
 static void(*displayFunc)(PuyoArrayActive& field, PuyoControl& controller) = Display;
 
 int main(int argc, char* argv[]) {
