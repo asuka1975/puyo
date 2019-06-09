@@ -209,7 +209,7 @@ void NextPuyoDisplay(PuyoArrayActive& field)
 void GameOverDisplay(PuyoArrayActive & field, PuyoControl & controller)
 {
 	static int delay = 0;
-	delay %= _WAITINGCOUNT * 4;
+	delay %= _WAITINGCOUNT * 3;
 
 	attrset(COLOR_PAIR(0));
 	for (int y = 0; y < LINES; y++) {
@@ -232,7 +232,7 @@ void GameOverDisplay(PuyoArrayActive & field, PuyoControl & controller)
 		mvaddstr(y + 3 + i, x - 2, record);
 	}
 
-	if (0 < delay && delay < _WAITINGCOUNT * 4 / 2) {
+	if (0 < delay && delay < _WAITINGCOUNT * 3 / 2) {
 		attrset(COLOR_PAIR(5));
 	}
 	else {
@@ -253,10 +253,6 @@ void GameOverDisplay(PuyoArrayActive & field, PuyoControl & controller)
 
 	attrset(COLOR_PAIR(0));
 	mvaddstr(y + 11, x - 2, "click N-Key to new game.");
-
-	char str[10];
-	sprintf(str, "%d", delay);
-	mvaddstr(0, 0, str);
 	
 	delay++;
 }
