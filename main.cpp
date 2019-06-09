@@ -71,6 +71,7 @@ int main(int argc, char* argv[]) {
 
 		switch (ch)
 		{
+			if (!is_gameover) {
 		case KEY_LEFT:
 			controller.MoveLeft(field);
 			break;
@@ -86,6 +87,7 @@ int main(int argc, char* argv[]) {
 		case 'x':
 			controller.Rotate(field, -1);
 			break;
+			}
 		case 'n':
 			if (is_gameover) {
 				is_gameover = false;
@@ -228,7 +230,7 @@ void GameOverDisplay(PuyoArrayActive & field, PuyoControl & controller)
 
 	char record[256];
 	for (int i = 0; i < records.size(); i++) {
-		sprintf(record, "%d. %d", i + 1, records[i]);
+		sprintf(record, "%d. %10d", i + 1, records[i]);
 		mvaddstr(y + 3 + i, x - 2, record);
 	}
 
@@ -241,13 +243,13 @@ void GameOverDisplay(PuyoArrayActive & field, PuyoControl & controller)
 	std::vector<int>::iterator iter = std::find(records.begin(), records.end(), score);
 	if (iter == records.end()) {
 		char yourscore[256];
-		sprintf(yourscore, "*. %d\t*", score);
+		sprintf(yourscore, "*. %10d", score);
 		mvaddstr(y + 9, x - 2, yourscore);
 	}
 	else {
 		int idx = std::distance(records.begin(), iter);
 		char yourscore[256];
-		sprintf(yourscore, "%d. %d\t*", idx + 1, score);
+		sprintf(yourscore, "%d. %10d", idx + 1, score);
 		mvaddstr(y + 3 + idx, x - 2, yourscore);
 	}
 
