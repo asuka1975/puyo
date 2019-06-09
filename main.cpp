@@ -7,7 +7,7 @@
 #include"PuyoGenerator.hpp"
 
 #ifdef __WINDOWS
-#define _WAITINGCOUNT 1000;
+#define _WAITINGCOUNT 1000
 #else
 #define _WAITINGCOUNT 20000
 #endif
@@ -85,6 +85,7 @@ int main(int argc, char* argv[]) {
 			break;
 		case 'x':
 			controller.Rotate(field, -1);
+			break;
 		case 'n':
 			if (is_gameover) {
 				is_gameover = false;
@@ -123,8 +124,8 @@ int main(int argc, char* argv[]) {
 			}
 		}
 		delay++;
+		delay %= waitCount;
 
-		
 		displayFunc(field, controller);
 	}
 
@@ -207,6 +208,9 @@ void NextPuyoDisplay(PuyoArrayActive& field)
 
 void GameOverDisplay(PuyoArrayActive & field, PuyoControl & controller)
 {
+	static int delay = 0;
+	delay %= _WAITINGCOUNT * 4;
+
 	attrset(COLOR_PAIR(0));
 	for (int y = 0; y < LINES; y++) {
 		for (int x = 0; x < COLS; x++) {
@@ -228,7 +232,12 @@ void GameOverDisplay(PuyoArrayActive & field, PuyoControl & controller)
 		mvaddstr(y + 3 + i, x - 2, record);
 	}
 
-	attrset(COLOR_PAIR(5));
+	if (0 < delay && delay < _WAITINGCOUNT * 4 / 2) {
+		attrset(COLOR_PAIR(5));
+	}
+	else {
+		attrset(COLOR_PAIR(0));
+	}
 	std::vector<int>::iterator iter = std::find(records.begin(), records.end(), score);
 	if (iter == records.end()) {
 		char yourscore[256];
@@ -236,15 +245,20 @@ void GameOverDisplay(PuyoArrayActive & field, PuyoControl & controller)
 		mvaddstr(y + 9, x - 2, yourscore);
 	}
 	else {
-		attrset(COLOR_PAIR(0));
 		int idx = std::distance(records.begin(), iter);
 		char yourscore[256];
 		sprintf(yourscore, "%d. %d\t*", idx + 1, score);
 		mvaddstr(y + 3 + idx, x - 2, yourscore);
 	}
 
+	attrset(COLOR_PAIR(0));
 	mvaddstr(y + 11, x - 2, "click N-Key to new game.");
+
+	char str[10];
+	sprintf(str, "%d", delay);
+	mvaddstr(0, 0, str);
 	
+	delay++;
 }
 
 void PutPuyoYX(unsigned int y, unsigned int x, puyocolor puyo)
@@ -272,6 +286,7 @@ void PutPuyoYX(unsigned int y, unsigned int x, puyocolor puyo)
 		mvaddch(y, x, ' ');
 		break;
 	default:
+		attrset(COLOR_PAIR(0));
 		mvaddch(y, x, '?');
 		break;
 	}
